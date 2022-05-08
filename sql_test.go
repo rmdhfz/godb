@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -170,4 +171,35 @@ func TestExecLastInsertID(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println("Insert ID", insertID)
+}
+
+func TestPrepareStatement(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	parent := context.Background()
+	ctx, cancel := context.WithTimeout(parent, 1*time.Second)
+	defer cancel()
+
+	script := "INSERT INTO user (username, password) VALUES(?,?)"
+	statement, err := db.PrepareContext(parent, script)
+	if err != nil {
+		panic(err)
+	}
+	defer statement.Close()
+
+	for i := 0; i < 10; i++ {
+		username := "test" + strconv.Itoa(i)
+		password := "test" + strconv.Itoa(i)
+
+		result, err := statement.ExecContext(ctx, username, password)
+		if err != nil {
+			panic(err)
+		}
+		id, err := result.LastInsertId()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(id)
+	}
 }
