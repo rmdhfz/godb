@@ -70,7 +70,7 @@ func TestQuerySQLComplex(t *testing.T) {
 	var id, name string
 	var email sql.NullString
 	var balance sql.NullInt32
-	var rating sql.Float64
+	var rating sql.NullFloat64
 	var brithDate, createdAt time.Time
 	var married bool
 
