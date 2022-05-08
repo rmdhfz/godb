@@ -203,3 +203,37 @@ func TestPrepareStatement(t *testing.T) {
 		fmt.Println(id)
 	}
 }
+
+func TestTransaction(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	parent := context.Background()
+	ctx, cancel := context.WithTimeout(parent, 1*time.Second)
+	defer cancel()
+
+	tx, err := db.Begin()
+	if err != nil {
+		panic(err)
+	}
+	script := "INSERT INTO user (username, password) VALUES(?,?)"
+	// transaksi
+	for i := 0; i < 10; i++ {
+		username := "test" + strconv.Itoa(i)
+		password := "test" + strconv.Itoa(i)
+
+		result, err := tx.ExecContext(ctx, script, username, password)
+		if err != nil {
+			panic(err)
+		}
+		id, err := result.LastInsertId()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(id)
+	}
+	err = tx.Rollback()
+	if err != nil {
+		panic(err)
+	}
+}
