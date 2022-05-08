@@ -148,3 +148,26 @@ func TestSQLInjectionSafe(t *testing.T) {
 		fmt.Println("Gagal login")
 	}
 }
+
+func TestExecLastInsertID(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	parent := context.Background()
+	ctx, cancel := context.WithTimeout(parent, 1*time.Second)
+	defer cancel()
+
+	username := "test"
+	password := "test"
+
+	script := "INSERT INTO user(username, password) VALUES(?,?)"
+	result, err := db.ExecContext(ctx, script, username, password)
+	if err != nil {
+		panic(err)
+	}
+	insertID, err := result.LastInsertId()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Insert ID", insertID)
+}
