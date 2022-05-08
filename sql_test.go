@@ -25,32 +25,32 @@ func TestExecSQL(t *testing.T) {
 	fmt.Println("success")
 }
 
-func TestQuerySQL(t *testing.T) {
-	db := GetConnection()
-	defer db.Close()
+// func TestQuerySQL(t *testing.T) {
+// 	db := GetConnection()
+// 	defer db.Close()
 
-	parent := context.Background()
-	ctx, cancel := context.WithTimeout(parent, 1*time.Second)
-	defer cancel()
+// 	parent := context.Background()
+// 	ctx, cancel := context.WithTimeout(parent, 1*time.Second)
+// 	defer cancel()
 
-	script := "SELECT * FROM customer"
-	rows, err := db.QueryContext(ctx, script)
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
+// 	script := "SELECT * FROM customer"
+// 	rows, err := db.QueryContext(ctx, script)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer rows.Close()
 
-	for rows.Next() {
-		var id, name string
-		err := rows.Scan(&id, &name)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("ID", id)
-		fmt.Println("Name", name)
-	}
-	fmt.Println("success")
-}
+// 	for rows.Next() {
+// 		var id, name string
+// 		err := rows.Scan(&id, &name)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 		fmt.Println("ID", id)
+// 		fmt.Println("Name", name)
+// 	}
+// 	fmt.Println("success")
+// }
 
 func TestQuerySQLComplex(t *testing.T) {
 	db := GetConnection()
@@ -69,8 +69,8 @@ func TestQuerySQLComplex(t *testing.T) {
 
 	var id, name string
 	var email sql.NullString
-	var balance int32
-	var rating float64
+	var balance sql.NullInt32
+	var rating sql.Float64
 	var brithDate, createdAt time.Time
 	var married bool
 
@@ -84,8 +84,12 @@ func TestQuerySQLComplex(t *testing.T) {
 		if email.Valid {
 			fmt.Println("Email", email.String)
 		}
-		fmt.Println("Balance", balance)
-		fmt.Println("Rating", rating)
+		if balance.Valid {
+			fmt.Println("Balance", balance.Int32)
+		}
+		if rating.Valid {
+			fmt.Println("Rating", rating.Float64)
+		}
 		fmt.Println("Married", married)
 		fmt.Println("Created At", createdAt)
 	}
